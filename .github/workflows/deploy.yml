@@ -1,0 +1,27 @@
+name: Validate Static Site
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-static-site:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Check for HTML, CSS, and JS files in dist/
+        run: |
+          echo "🔍 Checking HTML/CSS/JS in dist/"
+          test -d dist || (echo "❌ 'dist/' folder not found!" && exit 1)
+          find dist -type f \( -name "*.html" -o -name "*.css" -o -name "*.js" \) | while read file; do
+            if [ ! -s "$file" ]; then
+              echo "❌ $file is empty!"
+              exit 1
+            else
+              echo "✅ $file is valid"
+            fi
+          done
